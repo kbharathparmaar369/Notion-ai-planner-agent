@@ -4,7 +4,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 groq_api = os.getenv("GROQ_API_KEY")
+groq_api_key = groq_api
 notion_api = os.getenv("NOTION_API_KEY")
+notion_api_key = notion_api
 notion_db_id = os.getenv("NOTION_DB_ID") or os.getenv("NOTION_DATABASE_ID")
 
 if not groq_api:

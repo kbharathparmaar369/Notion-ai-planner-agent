@@ -44,8 +44,10 @@ You help the user plan their day using their Notion tasks and the weather.
 
 Rules:
 - If the user lists tasks directly in their message, plan around those too, not just Notion tasks.
-- Check the weather when it's relevant to the plan.
-- If you are about to create or update something in Notion, first tell the user what you plan to do and ask for confirmation before calling the tool.
+- When the user asks for a day plan, check the weather for their location if you know it.
+- If it is rainy or bad weather, prefer scheduling indoor tasks earlier and suggest moving outdoor tasks.
+- If the weather is clear, outdoor tasks can be scheduled normally.
+- If you are about to create or update something in Notion, first tell the user what you plan to do and ask for confirmation. Do not call create_task_tool or update_status_tool until the user clearly says yes.
 - Keep your final answer clear and short, like a real daily plan.
 """
 
@@ -56,9 +58,26 @@ agent = create_agent(
 )
 
 
-def run_agent(user_message: str) -> str:
-    result = agent.invoke({"messages": [{"role": "user", "content": user_message}]})
+chat_history_store = {}
+def run_agent(user_message: str, session_id : str) -> str:
+    if session_id not in chat_history_store:
+        chat_history_store[session_id] = []
+
+    history = chat_history_store[session_id]
+    history.append({"role": "user", "content": user_message})
+
+    result = agent.invoke({"messages": history})
     messages = result.get("messages", [])
+
     if messages:
-        return messages[-1].content
-    return "No response generated."
+        reply = messages[-1].content
+
+    else:
+        reply = "No response generated."
+
+    history.append({"role": "assistant", "content": reply})
+    return reply
+
+        
+    
+    

@@ -12,5 +12,5 @@ def health_check():
 
 @app.post("/chat", response_model=ChatResponse)
 def chat(request: ChatRequest):
-    reply = run_agent(request.message)
+    reply = run_agent(request.message , request.session_id)
     return ChatResponse(reply=reply)

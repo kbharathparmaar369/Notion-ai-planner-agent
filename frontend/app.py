@@ -2,14 +2,14 @@
 import streamlit as st
 import requests
 import uuid
-
+import os
 
 st.set_page_config(page_title="Notion AI Planner")
 
 st.title("Notion AI Planner")
 st.caption("Ask me to plan your day , check tasks , or check the weather")
 
-backend_url = "http://127.0.0.1:8000/chat"
+backend_url = os.getenv("BACKEND_URL", "http://127.0.0.1:8000/chat")
 
 if "session_id" not in st.session_state:
     st.session_state.session_id = str(uuid.uuid4())
@@ -27,7 +27,7 @@ with st.sidebar:
     st.write("what is the weather right now ?")
 
     if st.button("clear chat"):
-        st.session_state.message =[]
+        st.session_state.messages = []
         st.session_state.session_id = str(uuid.uuid4())
         st.rerun()
 

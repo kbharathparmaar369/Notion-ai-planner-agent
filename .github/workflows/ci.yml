@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Create dummy .env for tests
+        run: |
+          echo "GROQ_API_KEY=dummy" >> .env
+          echo "NOTION_API_KEY=dummy" >> .env
+          echo "NOTION_DATABASE_ID=dummy" >> .env
+
+      - name: Run tests
+        run: pytest
+
+  docker-build:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Build backend image
+        run: docker build -t notion-ai-planner-backend .
+
+      - name: Build frontend image
+        run: docker build -t notion-ai-planner-frontend -f frontend/Dockerfile .
